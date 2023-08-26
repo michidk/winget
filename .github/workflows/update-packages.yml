@@ -1,0 +1,49 @@
+name: Update winget packages
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron:  '0 3 * * *'  # Scheduled to run daily at 03:00
+
+env:
+  KOMAC_VERSION: 1.11.0
+
+jobs:
+  update:
+    name: Update package ${{ matrix.id }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        id: ["Typst.Typst", "Casey.Just"]
+
+    steps:
+    - name: Setup Java
+      uses: actions/setup-java@v2
+      with:
+        distribution: 'adopt'
+        java-version: '17'
+
+    - name: Install Komac
+      run: wget https://github.com/russellbanks/Komac/releases/download/v${{ env.KOMAC_VERSION }}/Komac-${{ env.KOMAC_VERSION }}-all.jar -O komac.jar
+
+    - name: Update package
+      run: java -jar komac.jar update --id=${{ matrix.id }} --submit --token=${{ secrets.KOMAC_TOKEN }} || true
+
+  cleanup:
+    name: Cleanup branches
+    needs: update # Not necessarily needed as PRs don't get closed that quick but still nice to have it in order
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Setup Java
+      uses: actions/setup-java@v2
+      with:
+        distribution: 'adopt'
+        java-version: '17'
+
+    - name: Install Komac
+      run: wget https://github.com/russellbanks/Komac/releases/download/v${{ env.KOMAC_VERSION }}/Komac-${{ env.KOMAC_VERSION }}-all.jar -O komac.jar
+
+    - name: Cleanup branches
+      run: java -jar komac.jar branch cleanup --token=${{ secrets.KOMAC_TOKEN }}
