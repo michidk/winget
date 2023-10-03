@@ -55,7 +55,7 @@ jobs:
       run: |
         VERSION=${{ steps.latest_release.outputs.result }}
         URL=${{ matrix.url }}
-        FINAL_URL=$(echo $URL | sed "s/\{VERSION}/$VERSION/g")
+        FINAL_URL=$(echo $URL | sed "s/{VERSION}/$VERSION/g")
         echo "FINAL_URL=$FINAL_URL" >> $GITHUB_ENV
         echo "Detected latest Version: ${{ steps.latest_release.outputs.result }}"
         echo "Final URL: $FINAL_URL"
