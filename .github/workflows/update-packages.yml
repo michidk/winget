@@ -37,21 +37,31 @@ jobs:
       run: wget https://github.com/russellbanks/Komac/releases/download/v${{ env.KOMAC_VERSION }}/Komac-${{ env.KOMAC_VERSION }}-all.jar -O komac.jar
 
     - name: Detect Latest Release
-      uses: actions/github-script@v5
       id: latest_release
+      uses: actions/github-script@v5
       with:
         script: |
-          const [owner, repo] = '${{ matrix.config.repo }}'.split('/');
-          const { data } = await github.repos.getLatestRelease({ owner, repo });
-          const tagName = data.tag_name.startsWith('v') ? data.tag_name.substring(1) : data.tag_name;
-          return tagName;
+          const [owner, repo] = '${{ matrix.repo }}'.split('/');
+          try {
+            const { data } = await github.rest.repos.getLatestRelease({ owner, repo });
+            const tagName = data.tag_name.startsWith('v') ? data.tag_name.substring(1) : data.tag_name;
+            return tagName;
+          } catch (error) {
+            console.error(`Failed to get latest release for repo: ${owner}/${repo}`);
+            core.setFailed('Failed to get the latest release.');
+          }
 
-    - name: Update package
+    - name: Compose URL
       run: |
         VERSION=${{ steps.latest_release.outputs.result }}
         URL=${{ matrix.url }}
         FINAL_URL=$(echo $URL | sed "s/\{VERSION}/$VERSION/g")
-        java -jar komac.jar update --id=${{ matrix.id }} --version $VERSION --url $FINAL_URL --submit --token=${{ secrets.KOMAC_TOKEN }} || true
+        echo "FINAL_URL=$FINAL_URL" >> $GITHUB_ENV
+        echo "Detected latest Version: ${{ steps.latest_release.outputs.result }}"
+        echo "Final URL: $FINAL_URL"
+
+    - name: Update package
+      run: java -jar komac.jar update --id ${{ matrix.id }} --version ${{ steps.latest_release.outputs.result }} --url $FINAL_URL --submit --token ${{ secrets.KOMAC_TOKEN }} || true
 
   cleanup:
     name: Cleanup branches
