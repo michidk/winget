@@ -15,7 +15,7 @@ jobs:
 
     strategy:
       matrix:
-        id: ["Typst.Typst", "Casey.Just"]
+        id: ["Typst.Typst", "Casey.Just", "michidk.vscli"]
 
     steps:
     - name: Setup Java
