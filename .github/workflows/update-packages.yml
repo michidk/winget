@@ -1,4 +1,4 @@
-name: Update winget packages
+name: Update WinGet Packages
 
 on:
   workflow_dispatch:
@@ -11,7 +11,7 @@ env:
 jobs:
   update:
     name: Update package ${{ matrix.id }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     strategy:
       matrix:
@@ -27,56 +27,21 @@ jobs:
             url: "https://github.com/michidk/vscli/releases/download/v{VERSION}/vscli-x86_64-pc-windows-msvc.zip"
 
     steps:
-    - name: Setup Java
-      uses: actions/setup-java@v2
+    - name: Update Packages
+      uses: michidk/winget-updater@v1
       with:
-        distribution: 'adopt'
-        java-version: '17'
-
-    - name: Install Komac
-      run: wget https://github.com/russellbanks/Komac/releases/download/v${{ env.KOMAC_VERSION }}/Komac-${{ env.KOMAC_VERSION }}-all.jar -O komac.jar
-
-    - name: Detect Latest Release
-      id: latest_release
-      uses: actions/github-script@v5
-      with:
-        script: |
-          const [owner, repo] = '${{ matrix.repo }}'.split('/');
-          try {
-            const { data } = await github.rest.repos.getLatestRelease({ owner, repo });
-            const tagName = data.tag_name.startsWith('v') ? data.tag_name.substring(1) : data.tag_name;
-            return tagName;
-          } catch (error) {
-            console.error(`Failed to get latest release for repo: ${owner}/${repo}`);
-            core.setFailed('Failed to get the latest release.');
-          }
-
-    - name: Compose URL
-      run: |
-        VERSION=${{ steps.latest_release.outputs.result }}
-        URL=${{ matrix.url }}
-        FINAL_URL=$(echo $URL | sed "s/{VERSION}/$VERSION/g")
-        echo "FINAL_URL=$FINAL_URL" >> $GITHUB_ENV
-        echo "Detected latest Version: ${{ steps.latest_release.outputs.result }}"
-        echo "Final URL: $FINAL_URL"
-
-    - name: Update package
-      run: java -jar komac.jar update --id ${{ matrix.id }} --version ${{ steps.latest_release.outputs.result }} --url $FINAL_URL --submit --token ${{ secrets.KOMAC_TOKEN }} || true
+        komac-token: ${{ secrets.KOMAC_TOKEN }}
+        package-id: ${{ matrix.id }}
+        repo: ${{ matrix.repo }}
+        url: ${{ matrix.url }}
 
   cleanup:
     name: Cleanup branches
     needs: update # Not necessarily needed as PRs don't get closed that quick but still nice to have it in order
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
-    - name: Setup Java
-      uses: actions/setup-java@v2
+    - name: Run Komac
+      uses: michidk/run-komac@v1
       with:
-        distribution: 'adopt'
-        java-version: '17'
-
-    - name: Install Komac
-      run: wget https://github.com/russellbanks/Komac/releases/download/v${{ env.KOMAC_VERSION }}/Komac-${{ env.KOMAC_VERSION }}-all.jar -O komac.jar
-
-    - name: Cleanup branches
-      run: java -jar komac.jar branch cleanup --token=${{ secrets.KOMAC_TOKEN }}
+        args: 'branch cleanup --token=${{ secrets.KOMAC_TOKEN }}'
