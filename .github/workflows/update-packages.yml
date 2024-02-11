@@ -5,9 +5,6 @@ on:
   schedule:
     - cron:  '0 3 * * *' # Scheduled to run daily at 03:00
 
-env:
-  KOMAC_VERSION: 1.11.0
-
 jobs:
   update:
     name: Update package ${{ matrix.id }}
