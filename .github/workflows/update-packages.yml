@@ -31,7 +31,7 @@ jobs:
       uses: michidk/winget-updater@latest
       with:
         komac-token: ${{ secrets.KOMAC_TOKEN }}
-        package-id: ${{ matrix.id }}
+        identifier: ${{ matrix.id }}
         repo: ${{ matrix.repo }}
         url: ${{ matrix.url }}
 
