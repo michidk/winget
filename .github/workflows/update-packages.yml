@@ -44,4 +44,4 @@ jobs:
     - name: Run Komac
       uses: michidk/run-komac@latest
       with:
-        args: 'cleanup --token=${{ secrets.KOMAC_TOKEN }}'
+        args: 'cleanup --only-merged --token=${{ secrets.KOMAC_TOKEN }}'
