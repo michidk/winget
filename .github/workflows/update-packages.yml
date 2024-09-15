@@ -33,6 +33,7 @@ jobs:
     - name: Update Packages
       uses: michidk/winget-updater@latest
       with:
+        komac-version: "2.6.0"
         komac-token: ${{ secrets.KOMAC_TOKEN }}
         identifier: ${{ matrix.id }}
         repo: ${{ matrix.repo }}
@@ -47,4 +48,5 @@ jobs:
     - name: Run Komac
       uses: michidk/run-komac@latest
       with:
+        komac-version: "2.6.0"
         args: 'cleanup --only-merged --token=${{ secrets.KOMAC_TOKEN }}'
