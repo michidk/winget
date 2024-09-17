@@ -26,9 +26,9 @@ jobs:
           - id: "glzr-io.glazewm"
             repo: "glzr-io/glazewm"
             url: "https://github.com/glzr-io/glazewm/releases/download/v{VERSION}/glazewm-{VERSION}.exe"
-          # - id: "glzr-io.zebar"
-          #   repo: "glzr-io/zebar"
-          #   url: "https://github.com/glzr-io/zebar/releases/download/v{VERSION}/zebar-v{VERSION}-opt1-x64.msi"
+          - id: "glzr-io.zebar"
+            repo: "glzr-io/zebar"
+            url: "https://github.com/glzr-io/zebar/releases/download/v{VERSION}/zebar-v{VERSION}-opt1-x64.msi"
           
     steps:
     - name: Update Packages
