@@ -32,7 +32,7 @@ jobs:
           
     steps:
     - name: Update Packages
-      uses: michidk/winget-updater@latest
+      uses: michidk/winget-updater@d2e9ce38251edda66e37724af400506240502d35 # latest
       with:
         komac-version: "2.15.0"
         komac-token: ${{ secrets.KOMAC_TOKEN }}
@@ -47,7 +47,7 @@ jobs:
 
     steps:
     - name: Run Komac
-      uses: michidk/run-komac@latest
+      uses: michidk/run-komac@b5627eaf2c8b839aa3be7580be1e2e5b72c13f91 # latest
       with:
         komac-version: "2.15.0"
         args: 'cleanup --only-merged --token=${{ secrets.KOMAC_TOKEN }}'
